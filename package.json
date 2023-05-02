@@ -1,0 +1,13 @@
+{
+  "name": "bl_client_dev",
+  "version": "1.0.0",
+  "description": "BitLite Client",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^15.5.7",
+    "web3": "^1.9.0"
+  }
+}
