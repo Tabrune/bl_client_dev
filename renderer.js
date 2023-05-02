@@ -1,12 +1,19 @@
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 
-// Handle the Metamask login button click event
-document.getElementById('metamask-login').addEventListener('click', () => {
-    ipcRenderer.send('login')
-})
+// Get Metamask object from main process and expose to window
+window.api = {};
+ipcRenderer.invoke('myAPI.sendMetamask').then((metamask) => {
+    if (metamask) {
+        window.api.metamask = metamask;
+    }
+});
 
-// Handle the login-success event, which is triggered when the Metamask login is successful
-ipcRenderer.on('login-success', (event, data) => {
-    document.getElementById('metamask-account').textContent = data.account
-    document.getElementById('metamask-balance').textContent = `${data.balance} ETH`
-})
+// Login with Metamask and send request to main process
+async function loginMetamask() {
+    const response = await ipcRenderer.invoke('login-metamask');
+    if (response.address) {
+        console.log(`Logged in with Metamask. Address: ${response.address}`);
+    } else if (response.error) {
+        console.error(response.error);
+    }
+}
