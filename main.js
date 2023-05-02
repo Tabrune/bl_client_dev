@@ -33,6 +33,12 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
+
+    // Listen for the Metamask object sent from the renderer process.
+    ipcMain.on("metamask-object", (event, metamaskObject) => {
+        console.log("Metamask object sent to main process");
+        contextBridge.exposeInMainWorld("metamask", metamaskObject);
+    });
 }
 
 app.on("ready", function () {
@@ -50,15 +56,4 @@ app.on("activate", function () {
     // On macOS, it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) createWindow();
-});
-
-contextBridge.exposeInMainWorld("myAPI", {
-    sendMetamask: function (metamask) {
-        ipcMain.once("metamask-ready", () => {
-            console.log("Metamask object sent to main process");
-        });
-        mainWindow.webContents.executeJavaScript(
-            `window.metamask = ${JSON.stringify(metamask)};`
-        );
-    },
 });

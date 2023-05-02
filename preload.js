@@ -1,20 +1,19 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("myAPI", {
-    getSystemInfo: function () {
-        return {
-            arch: process.arch,
-            platform: process.platform,
-            release: os.release(),
-        };
-    },
-    setWindowTitle: function (title) {
-        ipcRenderer.send("set-title", title);
-    },
-    setBadgeCount: function (count) {
-        ipcRenderer.send("set-badge-count", count);
-    },
-    sendMetamask: function (metamask) {
-        ipcRenderer.send("metamask-ready", metamask);
-    },
+window.addEventListener("load", () => {
+    // Create a dummy provider object.
+    const provider = {
+        isMetaMask: true,
+        request: async (request) => {
+            console.log("Request sent:", request);
+            return Promise.resolve({
+                id: request.id,
+                jsonrpc: request.jsonrpc,
+                result: "0x",
+            });
+        },
+    };
+
+    // Send the dummy provider object to the main process.
+    ipcRenderer.send("metamask-object", provider);
 });
